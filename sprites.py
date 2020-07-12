@@ -151,7 +151,7 @@ class Zomb(pg.sprite.Sprite):
         self.acc_y = 0
         self.rect.center = (self.x, self.y)
         self.rotate = 0
-
+#collision detection
     def ai_collide_with_walls(self, dir, action):
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False, collide_hit_rect)
@@ -174,17 +174,17 @@ class Zomb(pg.sprite.Sprite):
         return self.pos
 
 
-
+#set new state as current state
     def setState(self):
         zombie_pos = self.zombiehandling()
         self.state = ((self.player_x, self.player_y), zombie_pos)
         #print(self.state)
 
 
-
+#state at which the reward changes
     def TerminalState(self, state):
         if pg.sprite.spritecollide(self.game.player, self.game.zombs, False, collide_hit_rect):
-            #print("yeh")
+            #print("yeh")  (haha why not)
             return True
         else:
             return False
@@ -192,9 +192,10 @@ class Zomb(pg.sprite.Sprite):
     def step(self, action):
         x, y = self.x, self.y
         #print(self.actionSpace[action])
-
+#move as per action chosen
         if self.actionSpace[action] == 2 and self.rect.y < GRIDHEIGHT:
             self.y = self.y + 1
+            #to prevent errors 0.5 * TILESIZE is a suitable number
             self.rect.y = self.rect.y + 0.5 * TILESIZE
 
             #print("DOWN" , (self.x, self.y))
@@ -219,9 +220,12 @@ class Zomb(pg.sprite.Sprite):
             self.rect.x = self.rect.x - 0.5 * TILESIZE
         lol = self.zombiehandling()
         resultingState = ((self.player_x, self.player_y), lol)
+        #checks if the current state is a terminal one
         self.game.reward = -1 if not self.TerminalState(resultingState) else + 1
         #print(self.game.reward)
+        #set the new state as the current state
         self.setState()
+        #prevents crossing through the walls (the agent)
         self.hit_rect.centerx = self.rect.x
         self.ai_collide_with_walls('x', action)
         self.hit_rect.centery = self.rect.y
@@ -230,7 +234,7 @@ class Zomb(pg.sprite.Sprite):
             self.TerminalState(resultingState), None
 
 
-
+#random initialiser action (ie at the start choose a random action
     def actionSpaceSample(self):
         return np.random.choice(self.possibleActions)
 
