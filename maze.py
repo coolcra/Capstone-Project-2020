@@ -95,18 +95,19 @@ class Game:
         ALPHA = 1.0
         GAMMA = 0.5
         EPS = 1.0
+        #This code was after my first run i.e. after the table was initialised.
         #Q = {}
+        #loading the q-table from pickle
         with open('Q.pickle', 'rb') as f:
            Q = pickle.load(f)
-
+        #The chunk of code that is greyed out is the initialisation of my qtable (filling in all the coords)
         #for zomb in self.zombs:
         #    for state in zomb.stateSpace:
         #        for action in zomb.possibleActions:
         #           Q[state, action] = 0
+        #this line below is for my own tracking (to monitor whether the reward system was working 
         totalRewards = np.zeros(self.numGames)
-
         epRewards = 0
-
         rand = np.random.random()
         for zomb in self.zombs:
             observation = zomb.state
@@ -115,7 +116,7 @@ class Game:
                                                         else zomb.actionSpaceSample()
             #choosing the best action possible
 
-
+            #take the action and the new observation
             observationnew, reward, done, info = zomb.step(action)
 
             #print(action)
@@ -125,7 +126,7 @@ class Game:
             possible_actions = zomb.possibleActions
             action_ = maxAction(Q, observationnew, possible_actions)
             #print(action_)
-
+        #determining the new reward that should be accessed
         Q[observation,action] = Q[observation,action] + ALPHA*(self.reward + \
                     GAMMA*Q[observationnew,action_] - Q[observation,action])
         observation = observationnew
@@ -138,6 +139,7 @@ class Game:
             #print(totalRewards)
         with open('Q.pickle', 'wb') as f:
             # Pickle the 'data' dictionary using the highest protocol available.
+            #throw the q table into pickle
             pickle.dump(Q, f, pickle.HIGHEST_PROTOCOL)
 
     def draw_grid(self):
